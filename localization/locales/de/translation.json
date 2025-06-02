@@ -1,0 +1,17 @@
+{
+  "accountSettings": "Kontoeinstellungen",
+  "lightMode": "☀️ Heller Modus",
+  "darkMode": "🌙 Dunkler Modus",
+  "manager": "Manager",
+  "company": "Firma",
+  "country": "Land",
+  "billingDate": "Rechnungsdatum",
+  "plan": "Plan",
+  "language": "Sprache",
+  "customerId": "Kundennummer",
+  "premiumAccessNote": "Premium-Zugang für Architektenteams",
+  "billing": "Abrechnung",
+  "id": "ID",
+  "region": "Region",
+  "managePlan": "Plan verwalten"
+}

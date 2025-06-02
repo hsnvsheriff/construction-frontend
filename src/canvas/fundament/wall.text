@@ -1,0 +1,181 @@
+// drawWall.js
+import { fabric } from 'fabric';
+
+let curveWall = {
+  start: null,
+  end: null,
+  strength: 50,
+  direction: 1 // 1 = outward, -1 = inward
+};
+
+let isCurveMode = false;
+let isAwaitingDirection = false;
+let previewPath = null;
+
+export function initDrawWall(canvas, isWallModeActive) {
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'c' && isWallModeActive()) {
+      resetCurveWall();
+      isCurveMode = true;
+      alert('Curve drawing mode activated! Now click two points.');
+    }
+  });
+
+  canvas.on('mouse:down', function (opt) {
+    if (!isWallModeActive() || !isCurveMode) return;
+
+    const pointer = canvas.getPointer(opt.e);
+
+    if (!curveWall.start) {
+      curveWall.start = pointer;
+    } else if (!curveWall.end) {
+      curveWall.end = pointer;
+      askDirection(canvas); // ask "inside or outside"
+    }
+  });
+
+  window.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    resetCurveWall();
+    removeUI();
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      resetCurveWall();
+      removeUI();
+    }
+  });
+}
+
+function askDirection(canvas) {
+  if (document.getElementById('directionModal')) return;
+
+  isAwaitingDirection = true;
+
+  const modal = document.createElement('div');
+  modal.id = 'directionModal';
+  modal.innerHTML = `
+    <div style="position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);
+                background:white;padding:20px;border-radius:8px;z-index:10000;box-shadow:0 0 10px rgba(0,0,0,0.2)">
+      <h3>Curve Direction</h3>
+      <p>Should the curve bend inside or outside?</p>
+      <button id="insideBtn" style="margin-right:10px;">Inside</button>
+      <button id="outsideBtn">Outside</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  document.getElementById('insideBtn').onclick = () => {
+    curveWall.direction = -1;
+    document.body.removeChild(modal);
+    isAwaitingDirection = false;
+    showCurveUI(canvas);
+  };
+
+  document.getElementById('outsideBtn').onclick = () => {
+    curveWall.direction = 1;
+    document.body.removeChild(modal);
+    isAwaitingDirection = false;
+    showCurveUI(canvas);
+  };
+}
+
+function showCurveUI(canvas) {
+  if (document.getElementById('curveControls')) return;
+
+  const container = document.createElement('div');
+  container.id = 'curveControls';
+  container.style.position = 'absolute';
+  container.style.bottom = '30px';
+  container.style.left = '50%';
+  container.style.transform = 'translateX(-50%)';
+  container.style.zIndex = 1000;
+  container.style.background = 'white';
+  container.style.padding = '10px 20px';
+  container.style.borderRadius = '8px';
+  container.style.boxShadow = '0 0 8px rgba(0,0,0,0.1)';
+  container.innerHTML = `
+    <label style="font-weight:bold;margin-right:10px;">
+      Curvature Strength: <span id="curveValue">50</span>%
+    </label>
+    <input type="range" id="curveSlider" min="0" max="100" value="50" style="vertical-align:middle;" />
+    <button id="applyCurveBtn" style="margin-left:20px;">Apply Curve</button>
+  `;
+
+  document.body.appendChild(container);
+
+  document.getElementById('curveSlider').addEventListener('input', (e) => {
+    curveWall.strength = parseInt(e.target.value);
+    document.getElementById('curveValue').textContent = curveWall.strength;
+    drawPreview(canvas);
+  });
+
+  document.getElementById('applyCurveBtn').onclick = () => {
+    finalizeCurve(canvas);
+    removeUI();
+    resetCurveWall();
+  };
+
+  drawPreview(canvas);
+}
+
+function drawPreview(canvas) {
+  const { start, end, strength, direction } = curveWall;
+  if (!start || !end) return;
+
+  const points = [];
+  const steps = 100;
+  const dx = (end.x - start.x) / steps;
+  const dy = (end.y - start.y) / steps;
+
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const x = start.x + dx * i;
+    const y =
+      start.y + dy * i +
+      direction * Math.sin(t * Math.PI) * strength * 0.5;
+    points.push(`${x},${y}`);
+  }
+
+  const pathData = `M ${points.join(' L ')}`;
+
+  if (previewPath) canvas.remove(previewPath);
+
+  previewPath = new fabric.Path(pathData, {
+    stroke: '#ffa500',
+    strokeWidth: 3,
+    fill: '',
+    selectable: false,
+  });
+
+  canvas.add(previewPath);
+}
+
+function finalizeCurve(canvas) {
+  if (!previewPath) return;
+  previewPath.selectable = false;
+  previewPath.evented = true;
+  previewPath.set({ stroke: 'black' });
+  canvas.renderAll();
+  previewPath = null;
+}
+
+function resetCurveWall() {
+  curveWall = {
+    start: null,
+    end: null,
+    strength: 50,
+    direction: 1,
+  };
+  isCurveMode = false;
+  isAwaitingDirection = false;
+}
+
+function removeUI() {
+  const slider = document.getElementById('curveControls');
+  if (slider) slider.remove();
+
+  const modal = document.getElementById('directionModal');
+  if (modal) modal.remove();
+}

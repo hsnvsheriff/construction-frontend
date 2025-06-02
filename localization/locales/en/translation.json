@@ -1,0 +1,108 @@
+{
+  "sidebar": {
+    "home": "Home",
+    "createCollection": "Create Collection",
+    "assets": "Assets",
+    "design": "Design",
+    "models": "Models",
+    "settings": "Settings"
+  },
+  "settings": {
+    "accountSettings": "Account Settings",
+    "lightMode": "☀️ Light Mode",
+    "darkMode": "🌙 Dark Mode",
+    "manager": "Manager",
+    "company": "Company",
+    "country": "Country",
+    "billingDate": "Billing Date",
+    "plan": "Plan",
+    "language": "Language",
+    "customerId": "Customer ID"
+  },
+  "planCard": {
+    "premiumAccessNote": "Premium access for architectural teams",
+    "billing": "Billing",
+    "id": "ID",
+    "region": "Region",
+    "managePlan": "Manage Plan"
+  },
+  "assets": {
+    "select_category": "Select Category",
+    "category_sink": "Sink",
+    "category_bathtub": "Bathtub",
+    "category_toilet": "Toilet",
+    "category_shower": "Shower",
+    "category_mirror": "Mirror",
+    "category_faucet": "Faucet",
+    "category_accessory": "General Accessory"
+  },
+  "modes": {
+    "wall": "Wall",
+    "view": "View"
+  } ,
+  "designToolbar": {
+  "3dView": "3D View",
+  "quickExit": "Quick Exit",
+  "canvasEmpty": "⚠️ Canvas is empty or not restored yet.",
+  "nothingToSave": "⚠️ Canvas is empty — nothing to save."
+},
+"modelStore": {
+  "title": "3D Model Store",
+  "searchPlaceholder": "Search by product code...",
+  "search": "Search",
+  "noModelFound": "No model found with that code.",
+  "mongoId": "Mongo ID",
+  "productCode": "Product Code",
+  "category": "Category",
+  "s3Url": "S3 URL",
+  "copy": "Copy",
+  "copyUrl": "Copy URL",
+  "copied": "Copied!",
+  "deleteModel": "Delete Model",
+  "confirmDelete": "Are you sure you want to delete this model?",
+  "deleteFailed": "Failed to delete model.",
+  "backToAll": "Back to All Models"
+},
+"assetUpload": {
+  "title": "Upload Surface Asset",
+  "description": "Add new tile, laminate, or wallpaper to your asset library.",
+  "openLibrary": "Open Asset Library",
+  "uploadNew": "Upload New Asset",
+  "width": "Width (m)",
+  "height": "Height (m)",
+  "productCode": "Product Code",
+  "category": "Category",
+  "selectCategory": "Select",
+  "uploadButton": "Upload Asset",
+  "uploading": "Uploading...",
+  "uploadSuccess": "Asset uploaded successfully 🎉",
+  "uploadFailed": "Upload failed.",
+  "fillAllFields": "Please fill all fields and select a file."
+},"wallCard": {
+  "wallNamePlaceholder": "Wall Name",
+  "assetLabel": "Asset ID or Image URL",
+  "assetPlaceholder": "Mongo ID or S3 image URL",
+  "tileWidth": "Tile Width (m)",
+  "tileHeight": "Tile Height (m)",
+  "colorLabel": "Color Code",
+  "apply": "Apply",
+  "errorMissing": "Wall name or one input is required."
+},"viewerToolbar": {
+  "backTo2D": "Return to 2D",
+  "title": "3D Viewer",
+  "modelInputPlaceholder": "Enter model code (e.g., sink001)",
+  "importButton": "Import GLB"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+}

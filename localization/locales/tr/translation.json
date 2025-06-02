@@ -1,0 +1,109 @@
+{
+  "sidebar": {
+    "home": "Ana Sayfa",
+    "createCollection": "Koleksiyon Oluştur",
+    "assets": "Varlıklar",
+    "design": "Tasarım",
+    "models": "Modeller",
+    "settings": "Ayarlar"
+  },
+  "settings": {
+    "accountSettings": "Hesap Ayarları",
+    "lightMode": "☀️ Açık Mod",
+    "darkMode": "🌙 Karanlık Mod",
+    "manager": "Yönetici",
+    "company": "Şirket",
+    "country": "Ülke",
+    "billingDate": "Fatura Tarihi",
+    "plan": "Paket",
+    "language": "Dil",
+    "customerId": "Müşteri ID"
+  },
+  "planCard": {
+    "premiumAccessNote": "Mimari ekipler için premium erişim",
+    "billing": "Faturalama",
+    "id": "ID",
+    "region": "Bölge",
+    "managePlan": "Paketi Yönet"
+  },
+  "assets": {
+    "select_category": "Kategori Seç",
+    "category_sink": "Lavabo",
+    "category_bathtub": "Küvet",
+    "category_toilet": "Tuvalet",
+    "category_shower": "Duş",
+    "category_mirror": "Ayna",
+    "category_faucet": "Musluk",
+    "category_accessory": "Genel Aksesuar"
+  },
+  "modes": {
+    "wall": "Duvar",
+    "view": "Görünüm"
+  },
+  "designToolbar": {
+    "3dView": "3D Görünüm",
+    "quickExit": "Hızlı Çıkış",
+    "canvasEmpty": "⚠️ Tuval boş veya henüz yüklenmedi.",
+    "nothingToSave": "⚠️ Tuval boş — kaydedilecek bir şey yok."
+  },
+  "modelUpload": {
+  "title": "3D Model Yükle",
+  "description": ".glb model varlıklarını yükleyin (örn. tuvaletler, lavabolar).",
+  "uploadNew": "Yeni Model Yükle",
+  "chooseFile": "Dosya Seç",
+  "productCode": "Ürün Kodu",
+  "category": "Kategori",
+  "select": "Seç",
+  "uploadButton": "Modeli Yükle",
+  "openLibrary": "Model Kütüphanesini Aç"
+},
+  "modelStore": {
+    "title": "3B Model Mağazası",
+    "searchPlaceholder": "Ürün koduna göre ara...",
+    "search": "Ara",
+    "noModelFound": "Bu kodla eşleşen model bulunamadı.",
+    "mongoId": "Mongo ID",
+    "productCode": "Ürün Kodu",
+    "category": "Kategori",
+    "s3Url": "S3 URL",
+    "copy": "Kopyala",
+    "copyUrl": "URL'yi Kopyala",
+    "copied": "Kopyalandı!",
+    "deleteModel": "Modeli Sil",
+    "confirmDelete": "Bu modeli silmek istediğinizden emin misiniz?",
+    "deleteFailed": "Model silinemedi.",
+    "backToAll": "Tüm Modelleri Gör"
+  },
+  "assetUpload": {
+    "title": "Yüzey Varlığı Yükle",
+    "description": "Varlık kütüphanenize yeni karo, laminat veya duvar kağıdı ekleyin.",
+    "openLibrary": "Varlık Kütüphanesini Aç",
+    "uploadNew": "Yeni Varlık Yükle",
+    "width": "Genişlik (m)",
+    "height": "Yükseklik (m)",
+    "productCode": "Ürün Kodu",
+    "category": "Kategori",
+    "selectCategory": "Seç",
+    "uploadButton": "Varlığı Yükle",
+    "uploading": "Yükleniyor...",
+    "uploadSuccess": "Varlık başarıyla yüklendi 🎉",
+    "uploadFailed": "Yükleme başarısız oldu.",
+    "fillAllFields": "Lütfen tüm alanları doldurun ve bir dosya seçin."
+  },"wallCard": {
+  "wallNamePlaceholder": "Duvar Adı",
+  "assetLabel": "Varlık ID veya Görsel URL",
+  "assetPlaceholder": "Mongo ID veya S3 görsel URL",
+  "tileWidth": "Karo Genişliği (m)",
+  "tileHeight": "Karo Yüksekliği (m)",
+  "colorLabel": "Renk Kodu",
+  "apply": "Uygula",
+  "errorMissing": "Duvar adı veya en az bir giriş gereklidir."
+},"viewerToolbar": {
+  "backTo2D": "2D Görünüme Dön",
+  "title": "3D Görüntüleyici",
+  "modelInputPlaceholder": "Model kodu girin (örn: sink001)",
+  "importButton": "GLB Yükle"
+}
+
+
+}

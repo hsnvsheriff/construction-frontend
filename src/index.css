@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------ */
+/* 🌐 Global Layout Fixes                          */
+/* ------------------------------------------------ */
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  @apply bg-white text-black dark:bg-black dark:text-white;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* In case anything leaks outside root layout */
+body {
+  @apply bg-white text-black;
+}
+
+body.dark {
+  @apply bg-[#0f0f0f] text-white; /* Clean dark surface (not Tailwind default gray) */
+}
+
+/* ------------------------------------------------ */
+/* ✨ UX Enhancements                              */
+/* ------------------------------------------------ */
+
+/* Prevent margin collapse issues */
+* {
+  box-sizing: border-box;
+}
+
+/* Optional: Smooth transitions between modes */
+html, body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Remove blue tap highlight on mobile */
+button:focus, input:focus {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ------------------------------------------------ */
+/* 🪄 Scrollbar styling (optional)                 */
+/* ------------------------------------------------ */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+}
