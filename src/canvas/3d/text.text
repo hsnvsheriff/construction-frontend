@@ -12,10 +12,9 @@ import DataModel from '../core/DataModel';
 import { setupObjectMovement } from './ObjectMovement';
 import { addDynamicGround } from './addDynamicGround'; 
 import { setupLighting } from './setupLighting';
-import { addGridLightsToFloor } from './realism/addGridLightsToFloor';
-
-import { initRealismPack } from './realism/initRealismPack'; // ✅ already imported
-
+import { initRealismPack } from './realism/initRealismPack';
+import { createRealisticWallMaterial } from './realism/RealisticWallMaterial';
+import { createRealisticFloorMaterial } from './realism/RealisticFloorMaterial';
 import { createMaterialForElement } from './realism/createMaterialForElement';
 
 
@@ -38,10 +37,6 @@ const ThreeDViewer = forwardRef(({ onWallSelect }, ref) => {
   const dragIntersectPoint = useRef(new THREE.Vector3());
   const cameraRef = useRef(null);
   const rendererRef = useRef(null);
-  const ceilingsGroup = useRef(new THREE.Group());
-  const mainLightRef = useRef(null);
-
-
 
   // 🧠 Exposed Methods
   useImperativeHandle(ref, () => ({
@@ -145,9 +140,6 @@ loader.load(
     const scene = new THREE.Scene();
     sceneRef.current = scene;
     mountRef.current.__threeScene = scene;
-    scene.add(ceilingsGroup.current);
-
-
     const camera = new THREE.PerspectiveCamera(
       60,
       mount.clientWidth / mount.clientHeight,
@@ -155,23 +147,21 @@ loader.load(
       1000
     );
 
-    
-
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(mount.clientWidth, mount.clientHeight);
 
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.2; // 🌞 Brighter exposure
+renderer.toneMappingExposure = 0.7; // ⬅️ Reduce until it's not blinding
     mount.appendChild(renderer.domElement);
 
-setupLighting(scene, renderer, mainLightRef);
+    setupLighting(scene, renderer);
 
     let composer = null;
 
 initRealismPack({ renderer, scene, camera }).then((result) => {
-  composer = result.composer;
-  scene.environment = result.environment; // ← this makes materials reflect light
+  composer = result; // store the returned composer instance
 });
+
 
 
     // ✅ Correct placement — assign after declaration
@@ -217,8 +207,6 @@ const material = createMaterialForElement({
 
       const mesh = new THREE.Mesh(geometry, material);
       mesh.position.set(0, 0.01, 0);
-      mesh.receiveShadow = true;
-material.side = THREE.DoubleSide;
       mesh.userData = {
         type: 'floor',
         name: floor.name || 'Unnamed Floor',
@@ -227,26 +215,6 @@ material.side = THREE.DoubleSide;
       };
 
       floorsGroup.current.add(mesh);
-      const ceilingGeometry = geometry.clone();
-const ceilingMaterial = new THREE.MeshStandardMaterial({
-  color: '#f0f0f0',
-  side: THREE.DoubleSide,
-  roughness: 0.4,
-  metalness: 0.05,
-});
-
-// ✅ Auto-match ceiling height to wall
-const ceilingHeight = walls[0]?.metadata?.height || 3;
-const ceilingMesh = new THREE.Mesh(ceilingGeometry, ceilingMaterial);
-ceilingMesh.position.set(0, ceilingHeight, 0);
-
-ceilingMesh.userData = {
-  type: 'ceiling',
-  name: floor.name ? `${floor.name} Ceiling` : 'Ceiling',
-};
-
-ceilingsGroup.current.add(ceilingMesh);
-
     });
 
     scene.add(floorsGroup.current);
@@ -275,7 +243,6 @@ walls.forEach((wall) => {
   tileSizeX: wall.metadata?.tileSizeX,
   tileSizeY: wall.metadata?.tileSizeY,
   color: wall.metadata?.material?.colorCode,
-    reflecting: wall.metadata?.material?.reflecting ?? 10, // 👈 ADD THIS
 });
 
 
@@ -292,13 +259,7 @@ walls.forEach((wall) => {
     type: 'wall',
     id: wall.id,
     name: wall.metadata?.name || 'Unnamed Wall',
-material: {
-  ...wall.metadata?.material,
-  tileSizeX: wall.metadata?.tileSizeX,
-  tileSizeY: wall.metadata?.tileSizeY,
-  colorCode: wall.metadata?.material?.colorCode,
-  reflecting: wall.metadata?.material?.reflecting ?? 10,
-},
+    material: wall.metadata?.material || null,
   };
 
   wallsGroup.current.add(mesh);
@@ -324,15 +285,10 @@ material: {
       mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
       raycaster.current.setFromCamera(mouse.current, camera);
 
-  const intersects = raycaster.current.intersectObjects(
-  [
-    ...wallsGroup.current.children,
-    ...floorsGroup.current.children,
-...ceilingsGroup.current.children
-  ],
-  true
-);
-
+      const intersects = raycaster.current.intersectObjects(
+        [...wallsGroup.current.children, ...floorsGroup.current.children],
+        true
+      );
 
       if (intersects.length > 0) {
         const clickedObj = intersects[0].object;
@@ -423,30 +379,9 @@ useEffect(() => {
     }
   };
 
-
-
   window.addEventListener('keydown', handleKeyDown);
   return () => window.removeEventListener('keydown', handleKeyDown);
 }, []);
-
-useEffect(() => {
-  const handleLightControl = (e) => {
-    const light = mainLightRef.current;
-    if (!light) return;
-
-    if (e.key === '0') {
-      light.intensity = Math.min(light.intensity + 0.2, 5); // cap at 5
-      console.log('🔆 Increased light intensity:', light.intensity);
-    } else if (e.key === '9') {
-      light.intensity = Math.max(light.intensity - 0.2, 0); // floor at 0
-      console.log('🌑 Decreased light intensity:', light.intensity);
-    }
-  };
-
-  window.addEventListener('keydown', handleLightControl);
-  return () => window.removeEventListener('keydown', handleLightControl);
-}, []);
-
 
 
 

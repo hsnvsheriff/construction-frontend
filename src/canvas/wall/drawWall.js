@@ -175,24 +175,33 @@ function addWallToDataModel(points, layerId = 'Layer 0') {
     const start = points[i];
     const end = points[i + 1];
 
-    walls.push({
-      id: `${wallId}_${i}`,
-      name: `wall_${i + 1}`,
-      code: '',
-      type: 'wall',
-      layerId,
-      position: {
-        x: (start.x + end.x) / 2,
-        y: 0,
-        z: (start.y + end.y) / -2
-      },
-      metadata: {
-        start,
-        end,
-        thickness: 0.2,
-        height: 3
-      }
-    });
+   walls.push({
+  id: `${wallId}_${i}`,
+  name: `wall_${i + 1}`,
+  code: '',
+  type: 'wall',
+  layerId,
+  position: {
+    x: (start.x + end.x) / 2,
+    y: 0,
+    z: (start.y + end.y) / -2
+  },
+  metadata: {
+    start,
+    end,
+    thickness: 0.2,
+    height: 3,
+
+    // ✅ ADD THIS BLOCK:
+    material: {
+      previewUrl: '',           // empty = no texture
+      colorCode: '#dddddd',     // bright light gray for tile look
+      tileSizeX: 1,
+      tileSizeY: 1,
+    }
+  }
+});
+
   }
 
   const model = window.DataModel.store;

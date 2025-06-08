@@ -1,45 +1,43 @@
 import * as THREE from 'three';
 
 export function setupLighting(scene, renderer) {
-  // Enable high-quality shadows
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Soft, realistic
+  // ❌ Turn off global shadows
+  renderer.shadowMap.enabled = false;
 
-  // 🔆 Ambient Light for base brightness
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.25); // Lowered for contrast
-  scene.add(ambientLight);
+  // 🌤️ Ambient Light — soft global fill
+  const ambient = new THREE.AmbientLight(0xffffff, 0.6); // brighter for realism
+  scene.add(ambient);
 
-  // 🌞 Strong Directional Light (Sunlight)
-  const sun = new THREE.DirectionalLight(0xfff8e7, 1.5); // Slightly warm tone
-  sun.position.set(20, 50, 20);
-  sun.castShadow = true;
+  const spacing = 2.5;
+  const gridCount = 5;
 
-  sun.shadow.mapSize.width = 4096;
-  sun.shadow.mapSize.height = 4096;
-  sun.shadow.camera.near = 0.5;
-  sun.shadow.camera.far = 100;
-  sun.shadow.camera.left = -40;
-  sun.shadow.camera.right = 40;
-  sun.shadow.camera.top = 40;
-  sun.shadow.camera.bottom = -40;
+  // 🔆 Ceiling Lights Grid (for smooth even lighting)
+  for (let x = -spacing * 2; x <= spacing * 2; x += spacing) {
+    for (let z = -spacing * 2; z <= spacing * 2; z += spacing) {
+      const light = new THREE.PointLight(0xffffff, 1.0, 20); // lower intensity, enough for fill
+      light.position.set(x, 2.7, z); // just under ceiling
+      light.castShadow = false;     // ✅ Disable shadows
+      scene.add(light);
+    }
+  }
 
-  sun.shadow.bias = -0.0005; // reduce shadow acne
-  sun.shadow.radius = 4;     // softer edges
+  // 💡 Gentle Front Fill — to brighten front view
+  for (let i = 0; i < gridCount; i++) {
+    const offsetZ = 2 + i * 1.5;
+    const frontFill = new THREE.PointLight(0xffffff, 0.4, 10);
+    frontFill.position.set(0, 1.5, offsetZ);
+    frontFill.castShadow = false;
+    scene.add(frontFill);
+  }
 
-  scene.add(sun);
-
-  // 🔦 Rim Light (backlight for objects)
-  const rimLight = new THREE.DirectionalLight(0xffffff, 0.4);
-  rimLight.position.set(-20, 30, -20);
-  scene.add(rimLight);
-
-  // 💡 Skylight — very soft color bounce
-  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x666666, 0.3);
-  hemiLight.position.set(0, 60, 0);
-  scene.add(hemiLight);
-
-  // 💡 Fill Light (bottom bounce)
-  const fillLight = new THREE.PointLight(0xffffff, 0.2, 100);
-  fillLight.position.set(0, -10, 0);
-  scene.add(fillLight);
+  // 🌈 Rim Lights Behind — cinematic glow
+  for (let i = 0; i < gridCount; i++) {
+    const offsetX = -4 + i * 2;
+    const rimLight = new THREE.SpotLight(0xffffff, 0.2, 10, Math.PI / 6, 0.4);
+    rimLight.position.set(offsetX, 2.2, -4.5);
+    rimLight.target.position.set(0, 1.2, 0);
+    rimLight.castShadow = false; // ✅ Disable shadows
+    scene.add(rimLight);
+    scene.add(rimLight.target);
+  }
 }

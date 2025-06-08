@@ -14,19 +14,22 @@ const SelectedInfoCard = ({ selectedWall }) => {
   const [materialInfo, setMaterialInfo] = useState(null);
   const [error, setError] = useState('');
   const { t } = useTranslation();
+  const [reflecting, setReflecting] = useState(10); 
+
 
 
   useEffect(() => {
-    if (selectedWall) {
-      setExpanded(true);
-      setCurrentWall(selectedWall);
-      setWallName(selectedWall.userData?.name || '');
-      setAssetInput(selectedWall.userData?.material?.id || '');
-      setColorCode(selectedWall.userData?.colorCode || '');
-      setError('');
-      setMaterialInfo(null);
-    }
-  }, [selectedWall]);
+  if (selectedWall) {
+    setExpanded(true);
+    setCurrentWall(selectedWall);
+    setWallName(selectedWall.userData?.name || '');
+    setAssetInput(selectedWall.userData?.material?.id || '');
+    setColorCode(selectedWall.userData?.colorCode || '');
+    setError('');
+    setMaterialInfo(null);
+    setReflecting(selectedWall.userData?.material?.reflecting ?? 10); // ✅ Load reflecting from saved data
+  }
+}, [selectedWall]);
 
   useEffect(() => {
     const value = assetInput.trim();
@@ -54,33 +57,34 @@ const SelectedInfoCard = ({ selectedWall }) => {
     }
   }, [assetInput]);
 
-  const applyMaterialToMesh = (mesh, textureUrl, tileSizeX, tileSizeY) => {
-    if (!mesh || !textureUrl) return;
+const applyMaterialToMesh = (mesh, textureUrl, tileSizeX, tileSizeY, reflectValue = 10) => {
+  if (!mesh || !textureUrl) return;
 
-    const loader = new THREE.TextureLoader();
-    loader.setCrossOrigin('anonymous');
+  const loader = new THREE.TextureLoader();
+  loader.setCrossOrigin('anonymous');
 
-    loader.load(textureUrl, (texture) => {
-      if (mesh.material?.map) mesh.material.map.dispose();
-      if (mesh.material) mesh.material.dispose();
+  loader.load(textureUrl, (texture) => {
+    if (mesh.material?.map) mesh.material.map.dispose();
+    if (mesh.material) mesh.material.dispose();
 
-      texture.wrapS = THREE.RepeatWrapping;
-      texture.wrapT = THREE.RepeatWrapping;
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
 
-      mesh.material = new THREE.MeshStandardMaterial({
-        map: texture,
-        side: THREE.DoubleSide,
-        roughness: 0.8,
-        metalness: 0.1,
-      });
-
-      const geometryParams = mesh.geometry?.parameters || {};
-      const wallLength = geometryParams.width || 1;
-      const wallHeight = geometryParams.height || 1;
-      texture.repeat.set(wallLength / tileSizeX, wallHeight / tileSizeY);
-      mesh.material.needsUpdate = true;
+    mesh.material = new THREE.MeshStandardMaterial({
+      map: texture,
+      side: THREE.DoubleSide,
+      roughness: 1 - reflectValue / 30, // ← more reflect = lower roughness
+      metalness: 0.05 + reflectValue / 100, // slight shine increase
     });
-  };
+
+    const geometryParams = mesh.geometry?.parameters || {};
+    const wallLength = geometryParams.width || 1;
+    const wallHeight = geometryParams.height || 1;
+    texture.repeat.set(wallLength / tileSizeX, wallHeight / tileSizeY);
+    mesh.material.needsUpdate = true;
+  });
+};
+
 
   const handleApply = () => {
     if (!assetInput && !colorCode && !wallName.trim()) {
@@ -100,6 +104,7 @@ const SelectedInfoCard = ({ selectedWall }) => {
         previewUrl: materialInfo.previewUrl,
         width: materialInfo.width || 1,
         height: materialInfo.height || 1,
+          reflecting: reflecting, // ✅ add this
       };
 
       currentWall.userData.material = materialData;
@@ -107,60 +112,49 @@ const SelectedInfoCard = ({ selectedWall }) => {
       currentWall.userData.tileSizeY = materialData.height;
 
       if (currentWall?.isMesh) {
-        applyMaterialToMesh(
+                applyMaterialToMesh(
           currentWall,
           materialInfo.previewUrl,
           materialInfo.width || 1,
-          materialInfo.height || 1
+          materialInfo.height || 1,
+          reflecting
         );
+currentWall.userData.material.reflecting = reflecting;
+
       }
     }
 
-    if (colorCode) {
- const newMaterial = {
-  ...currentWall.userData.material,
-  color: colorCode,
-  type: 'color',
-};
+if (colorCode) {
+  const color = new THREE.Color(colorCode);
 
-currentWall.userData.material = newMaterial;
-currentWall.userData.colorCode = colorCode;
+  // ⛑️ Store in userData for persistence
+  currentWall.userData.material = {
+    ...currentWall.userData.material,
+    colorCode,
+    type: 'color',
+    reflecting,
+  };
 
-// 💾 Backfill so it's stored into .material directly
-if (currentWall.material?.color) {
-  try {
-    currentWall.material.color.set(colorCode);
-    currentWall.material.needsUpdate = true;
-  } catch (err) {
-    console.warn('⚠️ Failed to apply color:', err);
-  }
-} else {
-  currentWall.material = new THREE.MeshStandardMaterial({
-    color: new THREE.Color(colorCode),
+  currentWall.userData.colorCode = colorCode;
+
+  // 🔥 Always create a new material (even if one exists)
+  const newMaterial = new THREE.MeshStandardMaterial({
+    color,
     side: THREE.DoubleSide,
-    roughness: 0.8,
-    metalness: 0.1,
+    roughness: 1 - reflecting / 30,
+    metalness: 0.05 + reflecting / 100,
+    envMapIntensity: 2.0,
   });
-}
 
-
-  if (currentWall.material?.color) {
-    try {
-      currentWall.material.color.set(colorCode);
-      currentWall.material.needsUpdate = true;
-    } catch (err) {
-      console.warn('⚠️ Failed to apply color:', err);
-    }
-  } else {
-    // fallback if material missing or wrong type
-    currentWall.material = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(colorCode),
-      side: THREE.DoubleSide,
-      roughness: 0.8,
-      metalness: 0.1,
-    });
+  // 🧼 Clean old one
+  if (currentWall.material?.dispose) {
+    currentWall.material.dispose();
   }
+
+  currentWall.material = newMaterial;
+  currentWall.material.needsUpdate = true;
 }
+
 
 
     if (window.__fabricCanvas) {
@@ -287,6 +281,20 @@ value={materialInfo?.height ?? ''}
                 placeholder="#ffffff"
               />
             </div>
+
+            <div>
+  <label className="text-xs text-neutral-500">Reflecting</label>
+  <input
+    type="range"
+    min="0"
+    max="30"
+    value={reflecting}
+    onChange={(e) => setReflecting(parseInt(e.target.value))}
+    className="w-full"
+  />
+  <p className="text-xs mt-1">{reflecting}</p>
+</div>
+
 
             {error && <p className="text-xs text-red-500">{error}</p>}
 

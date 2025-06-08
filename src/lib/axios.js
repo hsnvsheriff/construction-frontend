@@ -1,3 +1,8 @@
+//import axios from 'axios';
+//const axiosInstance = axios.create({ baseURL: 'http://localhost:4000', withCredentials: true, // optional: set to false if you don’t use cookies});
+//export default axiosInstance;
+
+
 
 import axios from 'axios';
 import { getAuth } from 'firebase/auth';
