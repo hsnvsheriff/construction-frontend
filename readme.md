@@ -1,5 +1,3 @@
-Construction app against dinasours like Revit or Autodesk : 
+🏗️ 2D-to-3D Construction Visualizer (Revit-killer in your browser)
 
-# 🏗️ 2D-to-3D Construction Visualizer
-
-Forget Revit. This tool lets anyone sketch a building layout in 2D and instantly view it in 3D with applied materials — all in the browser, no installation needed.
+A lightweight alternative to bloated tools like Revit or AutoCAD, this app lets anyone sketch floor plans in 2D and instantly visualize fully textured 3D rooms — all in-browser, with zero setup. Users can draw walls, add wallpaper, tiles, or colors, and view the transformation in real time. Built solo in 1 month with React, Node.js, and Fabric.js.
